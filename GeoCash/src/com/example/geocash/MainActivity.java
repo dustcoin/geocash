@@ -1,6 +1,8 @@
 package com.example.geocash;
 
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
@@ -21,6 +23,7 @@ import org.json.JSONObject;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.view.Menu;
@@ -83,19 +86,35 @@ public class MainActivity extends Activity implements LocationListener	{
 	
 	        // Creating a LatLng object for the current location
 	        LatLng latLng = new LatLng(latitude, longitude);
-	
-	        myPosition = new LatLng(latitude, longitude);
-	        
-	        googleMap.addMarker(new MarkerOptions().position(myPosition).title("me"));
 	        
 	        CameraUpdate center =
-	                CameraUpdateFactory.newLatLng(latLng);
+	            CameraUpdateFactory.newLatLng(latLng);
 	            CameraUpdate zoom = CameraUpdateFactory.zoomTo(15);
 
 	            googleMap.moveCamera(center);
 	            googleMap.animateCamera(zoom);
         }
-        new GetLocationsTask().execute();
+        
+        final Handler handler = new Handler();
+        Timer timer = new Timer();
+        TimerTask updateLocations = new TimerTask() {       
+            @Override
+            public void run() {
+                handler.post(new Runnable() {
+                    public void run() {       
+                        try {
+                            new GetLocationsTask().execute();;
+                        } catch (Exception e) {
+                            // TODO Auto-generated catch block
+                        }
+                    }
+                });
+            }
+        };
+        timer.schedule(updateLocations, 0, 5000); // 5 seconds
+        
+        
+
     }
 
 	private class GetLocationsTask extends AsyncTask<Void, Void, JSONArray> {
