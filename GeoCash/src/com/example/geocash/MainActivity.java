@@ -111,9 +111,7 @@ public class MainActivity extends Activity implements LocationListener	{
                 });
             }
         };
-        timer.schedule(updateLocations, 0, 5000); // 5 seconds
-        
-        
+        timer.schedule(updateLocations, 0, 10000); // 10 seconds
 
     }
 
@@ -145,11 +143,12 @@ public class MainActivity extends Activity implements LocationListener	{
 		@Override
 		protected void onPostExecute(JSONArray json) {
 	        // Add markers for coin locations
+    		googleMap.clear();
 			try {
 	        	for (int i = 0; i < json.length(); i++) {
 	        		JSONObject loc = json.getJSONObject(i);
-	        		myPosition = new LatLng(loc.getDouble("lat"), loc.getDouble("lon"));
-	    	        
+	        		myPosition = new LatLng(loc.getDouble("lat"), loc.getDouble("lon"));        
+	        		
 	    	        googleMap.addMarker(new MarkerOptions().position(myPosition).title(loc.getString("name")
 	    	        		+ ": " + (loc.getBoolean("claimed") ? "Claimed" : "Available!")));
 	        	}
